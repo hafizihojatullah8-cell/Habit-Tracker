@@ -1,0 +1,122 @@
+<!DOCTYPE html><html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="theme-color" content="#4CAF50" />
+  <title>FocusHabit</title>
+  <link rel="manifest" href="manifest.json">
+  <style>
+    body {
+      font-family: sans-serif;
+      margin: 0;
+      padding: 0;
+      background: #f4f4f4;
+      color: #333;
+    }
+    header {
+      background: #4CAF50;
+      color: white;
+      padding: 1rem;
+      text-align: center;
+    }
+    main {
+      padding: 1rem;
+    }
+    .habit {
+      background: white;
+      padding: 1rem;
+      margin: 0.5rem 0;
+      border-radius: 8px;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      padding: 0.5rem 1rem;
+      border-radius: 4px;
+      cursor: pointer;
+    }
+    .welcome {
+      text-align: center;
+      padding: 2rem 1rem;
+      background: #e8f5e9;
+      border-bottom: 2px solid #c8e6c9;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>FocusHabit</h1>
+  </header>
+  <section class="welcome">
+    <h2>Welcome to FocusHabit!</h2>
+    <p>Track your daily habits and stay focused!</p>
+  </section>
+  <main>
+    <div id="habit-list"></div>
+    <button onclick="addHabit()">Add Habit</button>
+  </main>  <script>
+    // Check and request notification permission
+    function requestNotificationPermission() {
+      if ("Notification" in window) {
+        Notification.requestPermission().then(permission => {
+          if (permission === "granted") {
+            console.log("Notification granted");
+          }
+        });
+      }
+    }
+
+    function showNotification(title, body) {
+      if (Notification.permission === "granted") {
+        new Notification(title, {
+          body: body,
+          icon: "icon.png"
+        });
+      }
+    }
+
+    const habits = JSON.parse(localStorage.getItem("habits") || "[]");
+
+    function saveHabits() {
+      localStorage.setItem("habits", JSON.stringify(habits));
+    }
+
+    function renderHabits() {
+      const list = document.getElementById("habit-list");
+      list.innerHTML = "";
+      habits.forEach((habit, index) => {
+        const div = document.createElement("div");
+        div.className = "habit";
+        div.innerHTML = `
+          <span>${habit}</span>
+          <button onclick="completeHabit(${index})">Complete</button>
+        `;
+        list.appendChild(div);
+      });
+    }
+
+    function addHabit() {
+      const name = prompt("Enter habit name:");
+      if (name) {
+        habits.push(name);
+        saveHabits();
+        renderHabits();
+      }
+    }
+
+    function completeHabit(index) {
+      showNotification("Great job!", `You completed: ${habits[index]}`);
+      habits.splice(index, 1);
+      saveHabits();
+      renderHabits();
+    }
+
+    requestNotificationPermission();
+    renderHabits();
+  </script></body>
+</html>
